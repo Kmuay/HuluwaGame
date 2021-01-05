@@ -39,5 +39,4 @@ public class ChessBoardView {
     public ImageView get(int i) {
         return this.chessboard.get(i);
     }
-
 }

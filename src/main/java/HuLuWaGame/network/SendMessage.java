@@ -2,8 +2,10 @@ package HuLuWaGame.network;
 
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import HuLuWaGame.model.Creature;
 import HuLuWaGame.model.Game;
 
 public class SendMessage implements Runnable{
@@ -19,23 +21,24 @@ public class SendMessage implements Runnable{
 
     @Override
     public void run() {
-        System.out.println("Test for SendMessage");
+        //System.out.println("Test for SendMessage");
         try{
-            //将自己Game里的list_self发给对方
+            //将自己Game里的list_enemy & list_self 发给对方
             //ArrayList<Creature> -> String
-            //[name+hp+attack+range+position_x+position_y+alive]-[nextone]
-            while(Game.gamestate==0) {
-                pw = new PrintWriter(socket.getOutputStream(),true);
-                String msg = loadselfstr();
-                pw.println(msg);
-                System.out.println(msg);
-                TimeUnit.SECONDS.sleep(1);
-            }
-            while(Game.gamestate==1) {
-                pw = new PrintWriter(socket.getOutputStream(),true);
-                String msg = loadenemystr();
-                pw.println(msg);
-                System.out.println(msg);
+            //self/enemy*[name=hp=attack=range=position_x=position_y=alive]*[nextone]
+            Game game = new Game();
+            while(game.get_gamestate()==1) {
+                if(game.get_change()) {
+                    pw = new PrintWriter(socket.getOutputStream(),true);
+                    String msg = loadenemystr(game.get_list_enemy());
+                    pw.println(msg);
+                    System.out.println("send-1: "+msg);
+                    msg = loadselfstr(game.get_list_self());
+                    pw.println(msg);
+                    System.out.println("send-2: "+msg);
+                }
+                game.set_change(false);
+                game.set_end(true);
                 TimeUnit.SECONDS.sleep(1);
             }
             NetServer.serversocket.close();
@@ -46,57 +49,57 @@ public class SendMessage implements Runnable{
         }
     }
 
-    public synchronized String loadselfstr() {
-        String msg="";
+    public String loadenemystr(ArrayList<Creature> list) {
+        String msg="enemy*";
         for(int i=0; i<8; i++) {
-            msg += Game.list_self.get(i).get_name();
-            msg += "+";
-            msg += Game.list_self.get(i).get_hp();
-            msg += "+";
-            msg += Game.list_self.get(i).get_attack();
-            msg += "+";
-            msg += Game.list_self.get(i).get_range();
-            msg += "+";
-            msg += Game.list_self.get(i).get_position_x();
-            msg += "+";
-            msg += Game.list_self.get(i).get_position_y();
-            msg += "+";
-            if(Game.list_self.get(i).get_alive()) {
+            msg += list.get(i).get_name();
+            msg += "=";
+            msg += list.get(i).get_hp();
+            msg += "=";
+            msg += list.get(i).get_attack();
+            msg += "=";
+            msg += list.get(i).get_range();
+            msg += "=";
+            msg += list.get(i).get_position_x();
+            msg += "=";
+            msg += list.get(i).get_position_y();
+            msg += "=";
+            if(list.get(i).get_alive()) {
                 msg += "1";
             }
             else {
                 msg += "0";
             }
             if(i!=7) {
-                msg += "-";
+                msg += "*";
             }
         }
         return msg;
     }
 
-    public synchronized String loadenemystr() {
-        String msg="";
+    public String loadselfstr(ArrayList<Creature> list) {
+        String msg="self*";
         for(int i=0; i<8; i++) {
-            msg += Game.list_enemy.get(i).get_name();
-            msg += "+";
-            msg += Game.list_enemy.get(i).get_hp();
-            msg += "+";
-            msg += Game.list_enemy.get(i).get_attack();
-            msg += "+";
-            msg += Game.list_enemy.get(i).get_range();
-            msg += "+";
-            msg += Game.list_enemy.get(i).get_position_x();
-            msg += "+";
-            msg += Game.list_enemy.get(i).get_position_y();
-            msg += "+";
-            if(Game.list_enemy.get(i).get_alive()) {
+            msg += list.get(i).get_name();
+            msg += "=";
+            msg += list.get(i).get_hp();
+            msg += "=";
+            msg += list.get(i).get_attack();
+            msg += "=";
+            msg += list.get(i).get_range();
+            msg += "=";
+            msg += list.get(i).get_position_x();
+            msg += "=";
+            msg += list.get(i).get_position_y();
+            msg += "=";
+            if(list.get(i).get_alive()) {
                 msg += "1";
             }
             else {
                 msg += "0";
             }
             if(i!=7) {
-                msg += "-";
+                msg += "*";
             }
         }
         return msg;

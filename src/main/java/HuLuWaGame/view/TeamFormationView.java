@@ -2,9 +2,7 @@ package HuLuWaGame.view;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
-import HuLuWaGame.controller.UIController;
 import HuLuWaGame.model.Creature;
 import HuLuWaGame.model.Game;
 import HuLuWaGame.network.NetClient;
@@ -282,6 +280,7 @@ public class TeamFormationView extends Application {
         get_data();
         BattleView battleview = new BattleView(this.FACTION,this.list);
         Game new_game = new Game(0,this.list);
+        
         if(this.FACTION==1) {
             NetServer server = new NetServer();
             server.start();
@@ -290,11 +289,8 @@ public class TeamFormationView extends Application {
             NetClient client = new NetClient();
             client.start();
         }
+        
         try {
-            while(Game.list_enemy.size()==0){
-                TimeUnit.SECONDS.sleep(2);
-            }
-            Game.set_state(1);
             battleview.show();
         }
         catch(Exception e) {

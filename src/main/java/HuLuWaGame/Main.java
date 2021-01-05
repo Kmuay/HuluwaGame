@@ -32,12 +32,10 @@ public class Main extends Application{
         pane.getChildren().add(imageview);
 
         //添加服务器按钮
-        //TODO : 等待有客户端的连接
         button_offline.setOnMouseClicked((MouseEvent e) -> {show_preparesplview(1);});
         pane.getChildren().add(button_offline);
 
         //添加客户端按钮
-        //TODO ：输入服务器IP，连接，
         button_online.setOnMouseClicked((MouseEvent e) -> {show_preparesplview(2);});
         pane.getChildren().add(button_online);
 

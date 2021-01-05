@@ -2,11 +2,14 @@ package HuLuWaGame.view;
 
 import java.util.ArrayList;
 
+import HuLuWaGame.controller.BattleController;
+import HuLuWaGame.controller.UIController;
 import HuLuWaGame.model.Creature;
 import HuLuWaGame.model.Game;
 import javafx.application.Application;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -25,7 +28,7 @@ public class BattleView extends Application {
 
     private Stage stage = new Stage();
     //战场，纯展示，无任何Action接口
-    private static ChessBoardView chessboard = new ChessBoardView();
+    public static ChessBoardView chessboard = new ChessBoardView();
 
     //移动按钮，选择一个方向按钮
     private Button button_up = new Button();
@@ -34,46 +37,48 @@ public class BattleView extends Application {
     private Button button_right = new Button();
 
     //攻击目标按钮，选择一个敌方英雄
-    private Button firstenemy = new Button();
-    private Button secondenemy = new Button();
-    private Button thirdenemy = new Button();
-    private Button fourthenemy = new Button();
-    private Button fifthenemy = new Button();
-    private Button sixthenemy = new Button();
-    private Button seventhenemy = new Button();
-    private Button eighthenemy = new Button();
+    public static Button firstenemy = new Button();
+    public static Button secondenemy = new Button();
+    public static Button thirdenemy = new Button();
+    public static Button fourthenemy = new Button();
+    public static Button fifthenemy = new Button();
+    public static Button sixthenemy = new Button();
+    public static Button seventhenemy = new Button();
+    public static Button eighthenemy = new Button();
 
     //技能释放按钮
     private Button skill = new Button();
 
     //己方英雄状态栏，图片+HP+MP
-    private ImageView firstsoldier = new ImageView();
-    private Label hp_firstsoldier = new Label("HP:0");
-    private Label mp_firstsoldier = new Label("MP:0");
-    private ImageView secondsoldier = new ImageView();
-    private Label hp_secondsoldier = new Label("HP:0");
-    private Label mp_secondsoldier = new Label("MP:0");
-    private ImageView thirdsoldier = new ImageView();
-    private Label hp_thirdsoldier = new Label("HP:0");
-    private Label mp_thirdsoldier = new Label("MP:0");
-    private ImageView fourthsoldier = new ImageView();
-    private Label hp_fourthsoldier = new Label("HP:0");
-    private Label mp_fourthsoldier = new Label("MP:0");
-    private ImageView fifthsoldier = new ImageView();
-    private Label hp_fifthsoldier = new Label("HP:0");
-    private Label mp_fifthsoldier = new Label("MP:0");
-    private ImageView sixthsoldier = new ImageView();
-    private Label hp_sixthsoldier = new Label("HP:0");
-    private Label mp_sixthsoldier = new Label("MP:0");
-    private ImageView seventhsoldier = new ImageView();
-    private Label hp_seventhsoldier = new Label("HP:0");
-    private Label mp_seventhsoldier = new Label("MP:0");
-    private ImageView eighthsoldier = new ImageView();
-    private Label hp_eighthsoldier = new Label("HP:0");
-    private Label mp_eighthsoldier = new Label("MP:0");
+    public static ImageView firstsoldier = new ImageView();
+    public static Label hp_firstsoldier = new Label("HP:0");
+    public static Label mp_firstsoldier = new Label("MP:0");
+    public static ImageView secondsoldier = new ImageView();
+    public static Label hp_secondsoldier = new Label("HP:0");
+    public static Label mp_secondsoldier = new Label("MP:0");
+    public static ImageView thirdsoldier = new ImageView();
+    public static Label hp_thirdsoldier = new Label("HP:0");
+    public static Label mp_thirdsoldier = new Label("MP:0");
+    public static ImageView fourthsoldier = new ImageView();
+    public static Label hp_fourthsoldier = new Label("HP:0");
+    public static Label mp_fourthsoldier = new Label("MP:0");
+    public static ImageView fifthsoldier = new ImageView();
+    public static Label hp_fifthsoldier = new Label("HP:0");
+    public static Label mp_fifthsoldier = new Label("MP:0");
+    public static ImageView sixthsoldier = new ImageView();
+    public static Label hp_sixthsoldier = new Label("HP:0");
+    public static Label mp_sixthsoldier = new Label("MP:0");
+    public static ImageView seventhsoldier = new ImageView();
+    public static Label hp_seventhsoldier = new Label("HP:0");
+    public static Label mp_seventhsoldier = new Label("MP:0");
+    public static ImageView eighthsoldier = new ImageView();
+    public static Label hp_eighthsoldier = new Label("HP:0");
+    public static Label mp_eighthsoldier = new Label("MP:0");
+
+    private TextField choosesoldier = new TextField("1-8");
 
     public BattleView(int j, ArrayList<Creature> Alist) {
-        FACTION=j;
+        this.FACTION=j;
         this.list = Alist;
         try {
             init();
@@ -86,6 +91,8 @@ public class BattleView extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.show();
+        new Thread(new BattleController()).start();
+        new Thread(new UIController()).start();
     }
 
     @Override
@@ -179,6 +186,9 @@ public class BattleView extends Application {
         hp_eighthsoldier.setPrefWidth(80);
         mp_eighthsoldier.setPrefHeight(30);
         mp_eighthsoldier.setPrefWidth(80);
+
+        choosesoldier.setPrefHeight(30);
+        choosesoldier.setPrefWidth(80);
 
         //2 - init content
         stage.setTitle("葫芦娃 VS 妖精");
@@ -378,9 +388,9 @@ public class BattleView extends Application {
         hp_seventhsoldier.setText("HP:"+list.get(6).get_hp());
         hp_eighthsoldier.setText("HP:"+list.get(7).get_hp());
 
-        renew_chessboard(Game.list_self, Game.list_enemy);
-
         //3 - init layout
+        choosesoldier.setLayoutX(687);
+        choosesoldier.setLayoutY(30);
         //3-1 移动 & 技能 button
         button_up.setLayoutX(555);
         button_up.setLayoutY(105);
@@ -461,15 +471,30 @@ public class BattleView extends Application {
         
         //4 - init action
         //TODO : 上下左右攻击键，技能键
-        button_up.setOnMouseClicked((MouseEvent e) -> {System.out.println("up");});
+        button_up.setOnMouseClicked((MouseEvent e) -> {this.move(1);});
+        button_down.setOnMouseClicked((MouseEvent e) -> {this.move(2);});
+        button_left.setOnMouseClicked((MouseEvent e) -> {this.move(3);});
+        button_right.setOnMouseClicked((MouseEvent e) -> {this.move(4);});
+        firstenemy.setOnMouseClicked((MouseEvent e) -> {this.attack(0);});
+        secondenemy.setOnMouseClicked((MouseEvent e) -> {this.attack(1);});
+        thirdenemy.setOnMouseClicked((MouseEvent e) -> {this.attack(2);});
+        fourthenemy.setOnMouseClicked((MouseEvent e) -> {this.attack(3);});
+        fifthenemy.setOnMouseClicked((MouseEvent e) -> {this.attack(4);});
+        sixthenemy.setOnMouseClicked((MouseEvent e) -> {this.attack(5);});
+        seventhenemy.setOnMouseClicked((MouseEvent e) -> {this.attack(6);});
+        eighthenemy.setOnMouseClicked((MouseEvent e) -> {this.attack(7);});
     }
 
     public void show() throws Exception {
+        Game game = new Game();
+        renew_chessboard(game.get_list_self(),game.get_list_enemy());
+
         Pane pane = new Pane();
         //chessboard
         for(int i=0; i<100; i++) {
             pane.getChildren().add(chessboard.get(i));
         }
+        pane.getChildren().add(choosesoldier);
         //移动 & 技能 button
         pane.getChildren().addAll(button_up,button_down,button_left,button_right,skill);
         //敌方 button
@@ -488,18 +513,83 @@ public class BattleView extends Application {
         for(int i=0; i<list_self.size(); i++) {
             int position_x = list_self.get(i).get_position_x();
             int position_y = list_self.get(i).get_position_y();
-            String name = list_self.get(i).get_name();
-            System.out.println(name+".png");
-            URL url = getClass().getClassLoader().getResource(name+".png");
-            BattleView.chessboard.get(position_x + position_y * 10).setImage(new Image(url.toString()));
+            if(list_self.get(i).get_alive()) {
+                String name = list_self.get(i).get_name();
+                URL url = getClass().getClassLoader().getResource(name+".png");
+                BattleView.chessboard.get(position_x + position_y * 10).setImage(new Image(url.toString()));
+            }
+            else {
+                URL url = getClass().getClassLoader().getResource("DeadMen.png");
+                BattleView.chessboard.get(position_x + position_y * 10).setImage(new Image(url.toString()));
+            }
         }
+
         for(int i=0; i<list_enemy.size(); i++) {
             int position_x = list_enemy.get(i).get_position_x();
             int position_y = list_enemy.get(i).get_position_y();
-            String name = list_enemy.get(i).get_name();
-            System.out.println(name+".png");
-            URL url = getClass().getClassLoader().getResource(name+".png");
-            BattleView.chessboard.get(position_x + position_y * 10).setImage(new Image(url.toString()));
+            if(list_enemy.get(i).get_alive()) {
+                String name = list_enemy.get(i).get_name();
+                URL url = getClass().getClassLoader().getResource(name+".png");
+                BattleView.chessboard.get(position_x + position_y * 10).setImage(new Image(url.toString()));
+            }
+            else {
+                URL url = getClass().getClassLoader().getResource("DeadMen.png");
+                BattleView.chessboard.get(position_x + position_y * 10).setImage(new Image(url.toString()));
+            }
+        }
+
+    }
+    
+    public void move(int direction) {
+        int i = Integer.parseInt(this.choosesoldier.getText());
+        Game game = new Game();
+        boolean alive = game.get_list_self_i(i).get_alive();
+        if(alive) {
+            game.set_change(true);
+            int position_x = game.get_list_self().get(i-1).get_position_x();
+            int position_y = game.get_list_self().get(i-1).get_position_y();
+            if(direction==1) {
+                if(position_y!=0) {
+                    game.get_list_self().get(i-1).set_position_y(position_y-1);
+                }
+            }
+            else if(direction==2) {
+                if(position_y!=9) {
+                    game.get_list_self().get(i-1).set_position_y(position_y+1);
+                }
+            }
+            else if(direction==3) {
+                if(position_x!=0) {
+                    game.get_list_self().get(i-1).set_position_x(position_x-1);
+                }
+            }
+            else {
+                if(position_x!=9) {
+                    game.get_list_self().get(i-1).set_position_x(position_x+1);
+                }
+            }
+            Creature creature = game.get_list_self_i(i);
+            creature.set_mp(creature.get_mp()+10);
+            game.set_list_self_i(i, creature);
+        }
+    }
+
+    public void attack(int goal) {
+        int i = Integer.parseInt(this.choosesoldier.getText());
+        Game game = new Game();
+        boolean selfalive = game.get_list_self_i(i).get_alive();
+        boolean enemyalive = game.get_list_enemy_i(goal).get_alive();
+        if(selfalive && enemyalive) {
+            game.set_change(true);
+            int attack_number = game.get_list_self().get(i-1).get_attack();
+            int new_hp = game.get_list_enemy().get(goal).get_hp();
+
+            new_hp = new_hp - attack_number;
+            game.get_list_enemy().get(goal).set_hp(new_hp);
+
+            if(new_hp<=0) {
+                game.get_list_enemy().get(goal).set_alive(false);
+            }
         }
     }
 }

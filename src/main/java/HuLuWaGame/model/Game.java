@@ -1,69 +1,94 @@
 package HuLuWaGame.model;
 
 import java.util.ArrayList;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 //一局游戏需要维护的资源
 public class Game {
 
-    //1-游戏运行中 2-游戏结束且胜利 3-游戏结束且失败
-    public static int gamestate;
+    //读写锁
+    public final static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+    private static boolean change;
+
+    private static boolean end;
+
+    //0-游戏准备中 1-游戏运行中 2-游戏结束且胜利 3-游戏结束且失败
+    private static int gamestate;
     
     //8个自己的棋子
-    public static ArrayList<Creature> list_self = new ArrayList<Creature>(8);
+    private static ArrayList<Creature> list_self = new ArrayList<Creature>(8);
 
     //8个敌方棋子
-    public static ArrayList<Creature> list_enemy = new ArrayList<Creature>(8);
+    private static ArrayList<Creature> list_enemy = new ArrayList<Creature>(8);
+
+    public Game(){}
 
     public Game(int state, ArrayList<Creature> list) {
+        change = false;
         gamestate = state;
         list_self = list;
-    }
-
-    //每次action后，判断游戏是否结束，更新gamestate
-    public void end_or_not() {
-        int num_self_alive = 0;
-        int num_enemy_alive = 0;
-        for(int i=0; i<8; i++) {
-            if(list_self.get(i).get_alive()) {
-                num_self_alive++;
-            }
-            if(list_enemy.get(i).get_alive()) {
-                num_enemy_alive++;
-            }
-        }
-        if(num_self_alive!=0&&num_enemy_alive==0) {
-            Game.gamestate=2;
-        }
-        else {
-            if(num_self_alive==0&&num_enemy_alive!=0) {
-                Game.gamestate=3;
-            }
+        for(int i=0; i<8; i++){
+            Creature creature = new Creature();
+            list_enemy.add(creature);
         }
     }
 
-    public synchronized static void set_state(int i) {
-        Game.gamestate=i;
+    public synchronized int get_gamestate() {
+        return gamestate;
     }
 
-    //[name+hp+attack+range+position_x+position_y+alive]
-    public synchronized static void init_enemy(String msg) {
-        String[] temp = msg.split("-");
-        for(int i=0; i<temp.length; i++) {
-            String[] creature = temp[i].split("+");
-            list_enemy.get(i).set_name(creature[0]);
-            list_enemy.get(i).set_hp(Integer.parseInt(creature[1]));
-            list_enemy.get(i).set_attack(Integer.parseInt(creature[2]));
-            list_enemy.get(i).set_range(Integer.parseInt(creature[3]));
-            list_enemy.get(i).set_position_x(Integer.parseInt(creature[4]));
-            list_enemy.get(i).set_position_y(Integer.parseInt(creature[5]));
-            if(creature[6]=="1") {
-                list_enemy.get(i).set_alive(true);
-            }
-            else {
-                list_enemy.get(i).set_alive(false);
-            }
+    public synchronized void set_gamestate(int state) {
+        gamestate = state;
+    }
+
+    public ArrayList<Creature> get_list_self() {
+        return list_self;
+    }
+
+    public Creature get_list_self_i(int i) {
+        return list_self.get(i);
+    }
+
+    public void set_list_self(ArrayList<Creature> list) {
+        synchronized(list_self){
+            list_self = list;
         }
     }
 
+    public void set_list_self_i(int i,Creature creature) {
+        synchronized(list_self){
+            list_self.set(i, creature);
+        }
+    }
 
+    public ArrayList<Creature> get_list_enemy() {
+        return list_enemy;
+    }
+
+    public Creature get_list_enemy_i(int i) {
+        return list_enemy.get(i);
+    }
+
+    public void set_list_enemy(ArrayList<Creature> list) {
+        synchronized(list_enemy){
+            list_enemy=list;
+        }
+    }
+
+    public boolean get_change() {
+        return change;
+    }
+
+    public synchronized void set_change(boolean b) {
+        change = b;
+    }
+
+    public boolean get_end() {
+        return end;
+    }
+
+    public synchronized void set_end(boolean b) {
+        end = b;
+    }
 }
