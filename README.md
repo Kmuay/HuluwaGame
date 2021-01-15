@@ -88,8 +88,9 @@ BattleController：负责战斗逻辑
 
 ------------------------------------------------------
 ## 游戏运行指令
-在根目录下执行`mvn clean javafx:run`
-![RUN](/readme_resources/cmdrun.png)
+1. 运行``mvn clean``清除target文件
+2. 运行``mvn package``生成新的target
+3. 在target文件下，运行``java -jar Kmuay-1.0-SNAPSHOT.jar``(提交的文件中已有可以运行的jar文件)
 
 ------------------------------------------------------
 ## 开发体会
